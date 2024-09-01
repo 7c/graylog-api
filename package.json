@@ -1,7 +1,7 @@
 {
   "name": "graylog-api",
-  "version": "1.2.0",
-  "description": "Node.js module for Graylog2 API",
+  "version": "1.2.1",
+  "description": "NodeJS module for Graylog API (2024)",
   "author": {
     "name": "Andrii Kolomiichenko",
     "email": "bboywilld@gmail.com",
@@ -23,12 +23,13 @@
     }
   ],
   "dependencies": {
+    "debug": "^4.3.6",
     "request": "^2.60.0"
   },
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kolomiichenko/graylog-api.git"
+    "url": "https://github.com/7c/graylog-api.git"
   },
   "keywords": [
     "graylog",
@@ -41,9 +42,5 @@
     "logs",
     "logger"
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "http://github.com/kolomiichenko/graylog-api/issues"
-  },
-  "homepage": "http://github.com/kolomiichenko/graylog-api"
+  "license": "MIT"
 }

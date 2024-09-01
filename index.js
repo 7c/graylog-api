@@ -1,5 +1,6 @@
-var request = require("request");
-var methods = require("./api-methods");
+const debug = require('debug')('graylog-api');
+const request = require("request");
+const methods = require("./api-methods");
 
 function serializeObjToUri(obj) {
   return Object.keys(obj)
@@ -9,7 +10,7 @@ function serializeObjToUri(obj) {
     .join("&");
 }
 
-var Api = function(config) {
+const Api = function(config) {
   config = config || {}
   const basicAuthToken = config.basicAuth ?
     config.basicAuth.username + ':' + config.basicAuth.password + '@' : ''
@@ -17,6 +18,7 @@ var Api = function(config) {
   this._uri = (config.protocol || 'http') + '://' + basicAuthToken +
     (config.host || 'localhost') + ':' + (config.port || '12900') +
     (config.path || '')
+  debug('URI:', this._uri)
 };
 
 Object.keys(methods).forEach(function(mName) {
@@ -39,26 +41,30 @@ Object.keys(methods).forEach(function(mName) {
       reqUri = reqUri + "?" + serializeObjToUri(parameters);
     }
 
-    var opts = {
+    const opts = {
       url: reqUri,
       method: m.method,
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: m.method !== "GET" && parameters ? parameters : null,
       json: false
     };
+    debug('Request:', opts)
     request(opts, function(error, response, body) {
+      debug('Response: error:', error, `response:`,response && response.statusCode, `body:`,body)
       if (body === "") body = "{}";
-      if (error) {
+      if (error) 
         return callback([error, body]);
-      }
-      if (response.statusCode === 403) {
+      
+      if (response.statusCode === 403) // why 403?
         return callback([JSON.parse(body).message, body]);
-      }
+      if (response.statusCode === 401)  // authentication error
+        return callback(response.statusCode,null);
+      
 
-      var parsedBody;
+      let parsedBody;
       try {
         parsedBody = JSON.parse(body);
       } catch (err) {
@@ -70,8 +76,8 @@ Object.keys(methods).forEach(function(mName) {
   };
 });
 
-var connect = function(config, callback) {
-  var that = new Api(config);
+const connect = function(config, callback) {
+  const that = new Api(config);
   return that;
 };
 

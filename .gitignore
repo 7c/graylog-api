@@ -4,3 +4,5 @@ nbproject/
 
 node_modules
 npm-debug.log
+demo.js
+package-lock.json

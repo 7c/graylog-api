@@ -1,27 +1,36 @@
 # graylog-api
+fork of [kolomiichenko/graylog-api](https://github.com/kolomiichenko/graylog-api)
 
-Node.js module for Graylog2 API.
+## changes
+- added debug package for debugging, you can enable it by setting `DEBUG=graylog-api:*` in your environment
+- basic-auth seems to have problems, especially with reverse-proxies, for now best compatible method seems to be token auth, you need to create a new token in your graylog Settings>Users section and use token has username and 'token'(as string) as password
+- i have only tested search queries with graylog 6.* instance
+- added 401 handling which seems to be the new way of authentication failed
+
+
+Node.js module for Graylog2 API - this API works with latest (9/2024) version of Graylog versions
 
 All methods of this module compatitible with Graylog API v1.1.4 (59783f6).
 Search syntax look here: [The search query language](http://docs.graylog.org/en/latest/pages/queries.html).
-For more detail you can look Graylog REST API browser: [localhost:12900/api-browser](http://localhost:12900/api-browser).
+For more detail you can look Graylog REST API browser which is accessable through System>Nodes>Cluster Global API browser|API Browser.
 
 ## Quick examples
 
 ```javascript
-var graylog = require('graylog-api');
-var api = graylog.connect({
+const graylog = require('graylog-api');
+const api = graylog.connect({
   basicAuth: {
-    username: 'admin',
-    password: 'secret'
+    // token authentication
+    username: '0bog7eetr2a3afjpb6x3f88h1ff9epqaboldade4g5o0ud9tu16m',
+    password: 'token' // token auth
   }, // Optional. Default: null. Basic access authentication
   protocol: 'https', // Optional. Default: 'http'. Connection protocol
-  host: 'example.com', // Optional. Default: 'localhost'. API hostname
-  port: '12900', // Optional. Default: '12900'. API port
+  host: 'yourserver.com', // Optional. Default: 'localhost'. API hostname
+  port: '443', // Optional. Default: '12900'. API port (deprecated?)
   path: '/api' // Optional. Default: ''. API Path
 });
 
-api.searchAbsolute({ // parameters
+api.searchAbsolute({ 
   query: 'source:apache',
   from: '2015-07-24T00:00:00.000Z',
   to: '2015-07-25T00:00:00.000Z',
@@ -36,17 +45,19 @@ api.searchAbsolute({ // parameters
   }
 });
 
-updateUserPassword({ // parameters
-  old_password: 'secret',
-  password: 'qwerty123'
-}, { // path
-  username: 'admin'
+ api.searchRelative({
+    query: 'apicall:demo',
+    from: '2024-08-30T00:00:00.000Z',
+    to: '2024-09-02T00:00:00.000Z',
+    range:'60', // 60 seconds
+    limit: '1000',
+    fields: 'message,country',
 }, function (err, data) { // callback
-  if (err) {
-    console.log(err);
-  } else {
-    console.log(data);
-  }
+    if (err) {
+        console.log(err);
+    } else {
+        console.log(data);
+    }
 });
 
 api.getSystem(function(err, data) {  // only callback
@@ -56,14 +67,9 @@ api.getSystem(function(err, data) {  // only callback
 });
 ```
 
-## Download
-
-The source is available for download from
-[GitHub](https://github.com/kolomiichenko/graylog-api).
-Alternatively, you can install using Node Package Manager (`npm`):
-
+## Installation
 ```bash
-  npm install graylog-api
+npm i --save @7c/graylog-api
 ```
 
 ## Documentation
